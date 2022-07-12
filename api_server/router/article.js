@@ -18,10 +18,18 @@ const uploads = multer({
 const expressJoi = require('@escook/express-joi')
 // 导入需要的验证规则对象
 const {
-    add_article_schema
+    add_article_schema,
+    delete_article_schema,
+    update_article_schema
 } = require('../schema/article')
 
 // 发布文章的路由
 router.post('/add', uploads.single('cover_img'), expressJoi(add_article_schema), article_handler.addArticle)
+//获取文章数据的路由
+router.get('/getarticles', article_handler.getArticles)
 
+//删除文章 
+router.post('/deletearticles', expressJoi(delete_article_schema), article_handler.deleteArticles)
+//更新文章
+router.post('/updatearticles', expressJoi(update_article_schema), article_handler.updateArticles)
 module.exports = router
