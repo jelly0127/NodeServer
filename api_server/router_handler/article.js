@@ -2,20 +2,23 @@
 const path = require('path')
 const db = require('../db/index')
 const test = require('jelly-tools')
+const fs = require("fs");
+const {
+    baseUrl
+} = require('../config')
 // 发布文章的处理函数
 exports.addArticle = (req, res) => {
-    console.log(req.file);
-
-    console.log(req.body);
-    // if (!req.file || req.file.fieldname !== 'cover_img') return res.cc('文章封面是必选参数！')
-
+    const file = req.file;
+    //文件改名保存
+    fs.renameSync('uploads/' + file.filename, 'uploads/' + file.originalname); //这里修改文件名字
+    const URL = req.file.originalname
     // TODO：证明数据都是合法的，可以进行后续业务逻辑的处理
     // 处理文章的信息对象
     const articleInfo = {
         // 标题、内容、发布状态、所属分类的Id
         ...req.body,
         // 文章封面的存放路径
-        cover_img: path.join('/uploads', req.file.filename),
+        cover_img: baseUrl + 'uploads/' + URL,
         // cover_img: '',
 
         // 文章的发布时间
@@ -33,18 +36,28 @@ exports.addArticle = (req, res) => {
 }
 //获取文章数据
 exports.getArticles = (req, res) => {
-    const sql = `select * from ev_articles where is_delete=0 order by pub_date asc`
-
+    const page = req.body.pagenum
+    const pagesize = req.body.pagesize
+    const start = (page - 1) * pagesize
+    const sql = `select * from ev_articles where is_delete=0  order by id limit ${start},${pagesize}`
     db.query(sql, (err, results) => {
         if (err) return res.cc(err)
         if (results.length === 0) return res.cc('暂无数据！')
-        res.send({
+        let list = results
+        const count = `select count(*) as total from ev_articles where is_delete=0`
+        db.query(count, (err, resultss) => {
+            if (err) return res.cc(err)
+            let obj = {
                 status: 0,
                 message: '获取文章数据成功！',
-                data: results
+                pagesize: Number(pagesize),
+                pagenum: page,
+                total: resultss[0].total,
+                data: list
             }
+            res.send(obj)
 
-        )
+        })
     })
 
 }

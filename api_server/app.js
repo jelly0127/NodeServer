@@ -30,6 +30,7 @@ app.use((req, res, next) => {
 //配置解析Token的中间件
 const expressJWT = require('express-jwt')
 const config = require('./config')
+app.use('/uploads', express.static('./uploads'))
 app.use(expressJWT({
     secret: config.jwtSecretKey
 }).unless({
@@ -40,14 +41,13 @@ const userRouter = require('./router/user')
 const {
     patch
 } = require('./router/user')
+app.use(express.static("/uploads"))
 app.use('/api', userRouter)
 //导入用户信息路由
 const userinfoRouter = require('./router/userInfo')
 app.use('/my', userinfoRouter)
-//导入文章分类
-const artCateRouter = require('./router/artcate')
-app.use('/my/article', artCateRouter)
 
+//导入文章分类
 const articleRouter = require('./router/article')
 app.use('/my/article', articleRouter)
 //定义错误级别的中间件

@@ -11,7 +11,6 @@ exports.getArticleCates = (req, res) => {
         })
     })
 }
-
 // 新增文章分类的处理函数
 exports.addArticleCates = (req, res) => {
     // 1. 定义查重的 SQL 语句
@@ -49,6 +48,7 @@ exports.deleteCateById = (req, res) => {
         res.cc('删除文章成功！', 0)
     })
 }
+//获取id文章
 exports.getArticleById = (req, res) => {
     const sql = `select * from ev_article_cate where id=?`
     db.query(sql, req.params.id, (err, results) => {
