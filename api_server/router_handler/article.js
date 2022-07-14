@@ -1,7 +1,7 @@
 // 文章的处理函数模块
 const path = require('path')
 const db = require('../db/index')
-const test = require('jelly-tools')
+const moment = require('moment')
 const fs = require("fs");
 const {
     baseUrl
@@ -10,8 +10,9 @@ const {
 exports.addArticle = (req, res) => {
     const file = req.file;
     //文件改名保存
-    fs.renameSync('uploads/' + file.filename, 'uploads/' + file.originalname); //这里修改文件名字
-    const URL = req.file.originalname
+    fs.renameSync('uploads/' + file.filename, 'uploads/' + req.user.id + '-' + file.originalname); //这里修改文件名字
+    const URL = req.user.id + '-' + req.file.originalname
+    console.log(URL);
     // TODO：证明数据都是合法的，可以进行后续业务逻辑的处理
     // 处理文章的信息对象
     const articleInfo = {
@@ -22,7 +23,7 @@ exports.addArticle = (req, res) => {
         // cover_img: '',
 
         // 文章的发布时间
-        pub_date: test.dateFormat(new Date()),
+        pub_date: moment().format("YYYY/MM/DD HH:mm:ss"),
         // 文章作者的Id
         author_id: req.user.id,
     }
